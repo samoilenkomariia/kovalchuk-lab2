@@ -10,6 +10,9 @@ class circular_single_ll:
         self.head = None
 
     def append(self, data: str) -> None:
+        if not isinstance(data, str):
+            raise TypeError("Data must be of type str")
+        
         new_node = Node(data)
 
         if self.head is None:
@@ -34,6 +37,9 @@ class circular_single_ll:
         return count 
 
     def insert(self, data: str, index: int) -> None:
+        if not isinstance(data, str):
+            raise TypeError("Data must be of type str")
+
         if not isinstance(index, int):
             raise TypeError("Index must be an integer")
 
@@ -170,6 +176,7 @@ class circular_single_ll:
             print(current.data, end=" ")
             current = current.next
         print()
+        
             
     def find_first(self, data: str) -> int:
         if self.head is None:
