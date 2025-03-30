@@ -1,5 +1,5 @@
 class Node:
-    def __init__(self, data):
+    def __init__(self, data: chr):
         self.data = data
         self.next = None
 
@@ -9,7 +9,7 @@ class circular_single_ll:
     def __init__(self):
         self.head = None
 
-    def append(self, data) -> None:
+    def append(self, data: chr) -> None:
         new_node = Node(data)
 
         if self.head is None:
@@ -33,7 +33,10 @@ class circular_single_ll:
             count+=1
         return count 
 
-    def insert(self, data, index) -> None:
+    def insert(self, data: chr, index: int) -> None:
+        if not isinstance(index, int):
+            raise TypeError("Index must be an integer")
+
         if index > self.length() or index < 0:
             raise IndexError("Index out of boundaries")
         
@@ -58,7 +61,10 @@ class circular_single_ll:
         new_node.next = current.next
         current.next = new_node
     
-    def delete(self, index) -> chr:
+    def delete(self, index: int) -> chr:
+        if not isinstance(index, int):
+            raise TypeError("Index must be an integer")
+
         if index >= self.length() or index < 0:
             raise IndexError("Index out of boundaries")
         
@@ -89,7 +95,7 @@ class circular_single_ll:
         data = current.data
         return data 
     
-    def delete_all(self, data) -> None:
+    def delete_all(self, data: chr) -> None:
         if self.head is None:
             return
         
@@ -105,7 +111,10 @@ class circular_single_ll:
             else:
                 current = current.next
 
-    def get(self, index) -> chr:
+    def get(self, index: int) -> chr:
+        if not isinstance(index, int):
+            raise TypeError("Index must be an integer")
+
         if index >= self.length() or index < 0:
             raise IndexError("Index out of boundaries")
         
@@ -162,7 +171,7 @@ class circular_single_ll:
             current = current.next
         print()
             
-    def find_first(self, data) -> int:
+    def find_first(self, data: chr) -> int:
         if self.head is None:
             return -1
         current = self.head
@@ -172,7 +181,7 @@ class circular_single_ll:
             current = current.next
         return -1
     
-    def find_last(self, data) -> int:
+    def find_last(self, data: chr) -> int:
         if self.head is None:
             return -1
         
@@ -198,7 +207,7 @@ class circular_single_ll:
         
         self.head = None
 
-    def extend(self, list) -> None:
+    def extend(self, list: 'circular_single_ll') -> None:
         if list.head is None:
             return
         current = list.head
