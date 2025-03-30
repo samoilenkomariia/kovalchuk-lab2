@@ -10,9 +10,6 @@ class circular_single_ll:
         self.head = None
 
     def append(self, data: chr) -> None:
-        if not isinstance(data, chr):
-            raise TypeError("Data must be of character type")
-
         new_node = Node(data)
 
         if self.head is None:
@@ -37,9 +34,6 @@ class circular_single_ll:
         return count 
 
     def insert(self, data: chr, index: int) -> None:
-        if not isinstance(data, chr):
-            raise TypeError("Data must be of character type")
-
         if not isinstance(index, int):
             raise TypeError("Index must be an integer")
 
@@ -214,9 +208,6 @@ class circular_single_ll:
         self.head = None
 
     def extend(self, list: 'circular_single_ll') -> None:
-        if not isinstance(list, circular_single_ll):
-            raise TypeError('List must be circular linked list')
-        
         if list.head is None:
             return
         current = list.head
