@@ -1,5 +1,5 @@
 class Node:
-    def __init__(self, data: chr):
+    def __init__(self, data: str):
         self.data = data
         self.next = None
 
@@ -9,7 +9,7 @@ class circular_single_ll:
     def __init__(self):
         self.head = None
 
-    def append(self, data: chr) -> None:
+    def append(self, data: str) -> None:
         new_node = Node(data)
 
         if self.head is None:
@@ -33,7 +33,7 @@ class circular_single_ll:
             count+=1
         return count 
 
-    def insert(self, data: chr, index: int) -> None:
+    def insert(self, data: str, index: int) -> None:
         if not isinstance(index, int):
             raise TypeError("Index must be an integer")
 
@@ -61,7 +61,7 @@ class circular_single_ll:
         new_node.next = current.next
         current.next = new_node
     
-    def delete(self, index: int) -> chr:
+    def delete(self, index: int) -> str:
         if not isinstance(index, int):
             raise TypeError("Index must be an integer")
 
@@ -95,7 +95,7 @@ class circular_single_ll:
         data = current.data
         return data 
     
-    def delete_all(self, data: chr) -> None:
+    def delete_all(self, data: str) -> None:
         if self.head is None:
             return
         
@@ -111,7 +111,7 @@ class circular_single_ll:
             else:
                 current = current.next
 
-    def get(self, index: int) -> chr:
+    def get(self, index: int) -> str:
         if not isinstance(index, int):
             raise TypeError("Index must be an integer")
 
@@ -171,7 +171,7 @@ class circular_single_ll:
             current = current.next
         print()
             
-    def find_first(self, data: chr) -> int:
+    def find_first(self, data: str) -> int:
         if self.head is None:
             return -1
         current = self.head
@@ -181,7 +181,7 @@ class circular_single_ll:
             current = current.next
         return -1
     
-    def find_last(self, data: chr) -> int:
+    def find_last(self, data: str) -> int:
         if self.head is None:
             return -1
         
