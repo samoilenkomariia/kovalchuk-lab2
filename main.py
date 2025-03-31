@@ -166,18 +166,6 @@ class circular_single_ll:
         self.head.next = current  # 1->5
         self.head = current  # 5->4
 
-    def print_list(self) -> None:
-        if self.head is None:
-            print("")
-            return
-        current = self.head
-        print(current.data, end=" ")
-        current = current.next
-        while current != self.head:
-            print(current.data, end=" ")
-            current = current.next
-        print()
-
     def find_first(self, data: str) -> int:
         if self.head is None:
             return -1
@@ -218,6 +206,6 @@ class circular_single_ll:
         if list.head is None:
             return
         current = list.head
-        for i in range(list.length()):
+        for _ in range(list.length()):
             self.append(current.data)
             current = current.next
