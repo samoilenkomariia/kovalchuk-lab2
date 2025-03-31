@@ -12,6 +12,7 @@ class circular_single_ll:
 
     def __init__(self):
         self.head = None
+        self.list = []
 
     def append(self, data: str) -> None:
         if not isinstance(data, str):
@@ -19,26 +20,18 @@ class circular_single_ll:
 
         new_node = Node(data)
 
-        if self.head is None:
+        if not self.list:
             self.head = new_node
-            new_node.next = self.head
+            new_node.next = 0
+            self.list.append(new_node)
         else:
-            current_node = self.head
-            while current_node.next != self.head:
-                current_node = current_node.next
-            current_node.next = new_node
-            new_node.next = self.head
+            last_index = len(self.list) - 1
+            new_node.next = 0
+            self.list[last_index].next = len(self.list)
+            self.list.append(new_node)
 
     def length(self) -> int:
-        if self.head is None:
-            return 0
-
-        count = 1
-        current = self.head.next  # start from 2d node
-        while current != self.head:
-            current = current.next
-            count += 1
-        return count
+        return len(self.list)
 
     def insert(self, data: str, index: int) -> None:
         if not isinstance(data, str):
@@ -47,29 +40,27 @@ class circular_single_ll:
         if not isinstance(index, int):
             raise TypeError("Index must be an integer")
 
-        if index > self.length() or index < 0:
+        if index > len(self.list) or index < 0:
             raise IndexError("Index out of boundaries")
 
-        if self.head is None:
+        if not self.list:
             self.append(data)
             return
 
-        current = self.head
         new_node = Node(data)
 
+        new_node.next = index + 1
+        for i in range(index, len(self.list) - 1):
+            self.list[i].next += 1
+
+        if index == len(self.list):
+            self.list[len(self.list) - 1].next = len(self.list)
+            new_node.next = 0
+
+        self.list.insert(index, new_node)
+
         if index == 0:
-            while current.next != self.head:
-                current = current.next
-            current.next = new_node
-            new_node.next = self.head
             self.head = new_node
-            return
-
-        for _ in range(index - 1):
-            current = current.next
-
-        new_node.next = current.next
-        current.next = new_node
 
     def delete(self, index: int) -> str:
         if not isinstance(index, int):
@@ -78,32 +69,25 @@ class circular_single_ll:
         if index >= self.length() or index < 0:
             raise IndexError("Index out of boundaries")
 
-        if self.head.next == self.head:
+        if len(self.list) == 1:
             data = self.head.data
             self.head = None
+            self.list.clear()
             return data
 
-        current = self.head
+        for i in range(index + 1, len(self.list) - 1):
+            self.list[i].next -= 1
 
+        if index == len(self.list) - 1:
+            self.list[index - 1].next = 0
+        data = self.list.pop(index)
         if index == 0:
-            data = self.head.data
-            while current.next != self.head:
-                current = current.next
-            current.next = self.head.next
-            self.head = self.head.next
-            return data
+            self.head = self.list[0]
 
-        prev = None
-        for _ in range(index):
-            prev = current
-            current = current.next
-
-        prev.next = current.next
-        data = current.data
         return data
 
     def delete_all(self, data: str) -> None:
-        if self.head is None:
+        if len(self.list) == 0:
             return
 
         while self.head and self.head.data == data:
@@ -111,12 +95,12 @@ class circular_single_ll:
             if self.head is None:
                 return
 
-        current = self.head
-        while current.next != self.head:
-            if current.next.data == data:
-                current.next = current.next.next
+        i = 0
+        for _ in range(self.length()):
+            if self.list[i].data == data:
+                self.delete(i)
             else:
-                current = current.next
+                i = self.list[i].next
 
     def get(self, index: int) -> str:
         if not isinstance(index, int):
@@ -125,87 +109,54 @@ class circular_single_ll:
         if index >= self.length() or index < 0:
             raise IndexError("Index out of boundaries")
 
-        current = self.head
-
-        for _ in range(index):
-            current = current.next
-        return current.data
+        return self.list[index].data
 
     def clone(self) -> 'circular_single_ll':
-        new_list = circular_single_ll()
-
-        if self.head is not None:
-            current = self.head
-            for _ in range(self.length()):
-                new_list.append(current.data)
-                current = current.next
-        return new_list
+        res = circular_single_ll()
+        if not self.list:
+            return res
+        res.list = self.list.copy()
+        res.head = res.list[0]
+        return res
 
     def reverse(self) -> None:
-        if self.head is None or self.head.next == self.head:
+        if self.length() <= 1:
             return
-        '''
-        The approach: making the current node point to the previous one 
-        in a loop until the last node is reached, 
-        then making the last node point to the previous one, 
-        making the initial head (the original first node) point to the last node, 
-        and making the last node the new head of the list.
-        
-        example list: 1 2 3 4 5
-        '''
-        current = self.head  # 1->2
-        prev = None
-        next_node = current.next  # 2->3
-        while next_node != self.head:
-            current.next = prev  # 1->None # 2->1 # 3->2 #4->3
-            prev = current  # 1->None # 2->1 # 3->2 #4->3
-            current = next_node  # 2->3 # 3->4 # 4->5 #5->1
-            next_node = next_node.next  # 3->4 #4->5 #5->1 #1->None
 
-        current.next = prev  # 5->4
-        self.head.next = current  # 1->5
-        self.head = current  # 5->4
+        self.list.reverse()
+        i = 1
+        for node in self.list:
+            node.next = i
+            i += 1
+        self.list[self.length() - 1].next = 0
+        self.head = self.list[0]
 
     def find_first(self, data: str) -> int:
         if self.head is None:
             return -1
-        current = self.head
         for i in range(self.length()):
-            if current.data == data:
+            if self.list[i].data == data:
                 return i
-            current = current.next
         return -1
 
     def find_last(self, data: str) -> int:
         if self.head is None:
             return -1
 
-        current = self.head
         res = -1
         for i in range(self.length()):
-            if current.data == data:
+            if self.list[i].data == data:
                 res = i
-            current = current.next
         return res
 
     def clear(self) -> None:
-        if self.head is None:
+        if not self.list:
             return
-
-        current = self.head
-        while True:
-            next_node = current.next
-            current.next = None
-            if next_node == self.head:
-                break
-            current = next_node
-
         self.head = None
+        self.list.clear()
 
-    def extend(self, list: 'circular_single_ll') -> None:
-        if list.head is None:
+    def extend(self, cll: 'circular_single_ll') -> None:
+        if cll.head is None:
             return
-        current = list.head
-        for _ in range(list.length()):
-            self.append(current.data)
-            current = current.next
+        for i in range(cll.length()):
+            self.append(cll.list[i].data)
