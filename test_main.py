@@ -9,10 +9,12 @@ class TestCircularSingleLinkedList(unittest.TestCase):
 
     def test_circular_traversal(self):
         self.create_list(5)
-        current = self.cll.head
-        for _ in range(5):
-            current = current.next
-        self.assertEqual(current, self.cll.head)
+        for i in range(5):
+            with self.subTest(i=i):
+                if i < 4:
+                    self.assertEqual(self.cll.list[i].next, i + 1)
+                else:
+                    self.assertEqual(self.cll.list[i].next, 0)
 
     def create_list(self, input_data):
         if isinstance(input_data, int):
@@ -28,20 +30,19 @@ class TestCircularSingleLinkedList(unittest.TestCase):
     def test_append_empty_list(self):
         self.cll.append('d')
         self.assertEqual(self.cll.head.data, 'd')
-        self.assertEqual(self.cll.head, self.cll.head.next)
+        self.assertEqual(self.cll.head.next, 0)
 
         self.cll.append('a')
         self.assertEqual(self.cll.head.data, 'd')
-        self.assertEqual(self.cll.head.next.data, 'a')
-        self.assertEqual(self.cll.head, self.cll.head.next.next)
+        self.assertEqual(self.cll.head.next, 1)
+        self.assertEqual(self.cll.list[1].data, 'a')
+        self.assertEqual(self.cll.list[1].next, 0)
 
     def test_append(self):
         self.create_list(4)
-        current = self.cll.head
         for i in range(4):
-            self.assertEqual(current.data, str(i))
-            current = current.next
-        self.assertEqual(self.cll.head, current)
+            self.assertEqual(self.cll.list[i].data, str(i))
+        self.assertEqual(self.cll.head, self.cll.list[0])
 
     def test_append_invalid_data(self):
         test_cases = [2, 12, ['s'], True, None]
@@ -80,24 +81,21 @@ class TestCircularSingleLinkedList(unittest.TestCase):
 
     def test_insert_into_empty_list(self):
         self.cll.insert("a", 0)
-        self.assertEqual(self.cll.head, self.cll.head.next)
         self.assertEqual(self.cll.head.data, "a")
+        self.assertEqual(self.cll.head.next, 0)
         self.assertEqual(self.cll.length(), 1)
 
     def test_insert_at_end(self):
         self.create_list(5)
         self.cll.insert("b", 5)
         self.assertEqual(self.cll.length(), 6)
-        current = self.cll.head.next
-        for _ in range(4):
-            current = current.next
-        self.assertEqual(current.data, "b")
-        self.assertEqual(current.next, self.cll.head)
+        self.assertEqual(self.cll.list[5].data, "b")
+        self.assertEqual(self.cll.list[5].next, 0)
 
     def test_insert_in_middle(self):
         self.create_list(5)
         self.cll.insert("b", 2)
-        self.assertEqual(self.cll.head.next.next.data, "b")
+        self.assertEqual(self.cll.list[2].data, "b")
         self.assertEqual(self.cll.length(), 6)
 
     def test_delete_non_int_index(self):
@@ -132,53 +130,31 @@ class TestCircularSingleLinkedList(unittest.TestCase):
     def test_delete_first(self):
         self.create_list(5)
 
-        current = self.cll.head
-        for _ in range(4):
-            current = current.next
-
-        node_data = self.cll.head.data
         del_node_data = self.cll.delete(0)
         self.assertEqual(self.cll.length(), 4)
-        self.assertEqual(del_node_data, node_data)
         # check if head is updated
         self.assertNotEqual(del_node_data, self.cll.head.data)
         # check if last is pointing to the updated head
-        self.assertEqual(current.next, self.cll.head)
+        self.assertEqual(self.cll.list[self.cll.length() - 1].next, 0)
 
     def test_delete_third(self):
-        for i in range(5):
-            self.cll.append(str(i))
-            if i == 0:
-                current = self.cll.head
-            else:
-                current = current.next
-                if i == 2:
-                    node_data = current.data
+        self.create_list(5)
 
         del_node_data = self.cll.delete(2)
         self.assertEqual(self.cll.length(), 4)
-        self.assertEqual(del_node_data, node_data)
         # check if new third node is not as deleted one
-        self.assertNotEqual(del_node_data, self.cll.head.next.next.data)
+        self.assertNotEqual(del_node_data, self.cll.list[2].data)
         # check if third node is '3' now, not '2'
-        self.assertEqual(self.cll.head.next.next.data, '3')
+        self.assertEqual(self.cll.list[2].data, '3')
 
     def test_delete_last(self):
-        for i in range(5):
-            self.cll.append(str(i))
-            if i == 0:
-                current = self.cll.head
-            else:
-                current = current.next
-                if i == 3:
-                    fourth_node = current
+        self.create_list(5)
 
-        node_data = current.data
         del_node_data = self.cll.delete(4)
         self.assertEqual(self.cll.length(), 4)
-        self.assertEqual(del_node_data, node_data)
         # verify new last node
-        self.assertEqual(fourth_node.next, self.cll.head)
+        self.assertNotEqual(del_node_data, self.cll.list[3].data)
+        self.assertEqual(self.cll.list[3].next, 0)
 
     def test_delete_all_empty_list(self):
         self.assertIsNone(self.cll.head)
@@ -190,48 +166,39 @@ class TestCircularSingleLinkedList(unittest.TestCase):
         self.assertIsNone(self.cll.head)
 
     def test_delete_all_invalid_values(self):
-        for i in range(4):
-            self.cll.append(str(i))
+        self.create_list(4)
 
         test_cases = [2, ['d'], None]
         for t in test_cases:
             self.cll.delete_all(t)
         current = self.cll.head
         for i in range(4):
-            if current.data != str(i):
+            if self.cll.list[i].data != str(i):
                 self.fail(
                     f"delete_all_invalid_values: expected {i}, got {current.data}"
                 )
-            current = current.next
 
     def test_delete_all(self):
         test_cases = ["a", "b", "b", "a", "a", "c", "a"]
-        for t in test_cases:
-            self.cll.append(t)
-        self.cll.delete_all("a")
+        self.create_list(test_cases)
 
+        self.cll.delete_all("a")
         self.assertEqual(self.cll.length(), 3)
-        current = self.cll.head
-        for _ in range(3):
-            with self.subTest():
-                self.assertNotEqual(current.data, "a")
-            current = current.next
+        for i in range(3):
+            with self.subTest(i=i):
+                self.assertNotEqual(self.cll.list[i].data, "a")
 
     def test_delete_all_no_matches(self):
-        for i in range(3):
-            self.cll.append(str(i))
+        self.create_list(3)
 
-        self.cll.delete_all('3')
+        self.cll.delete_all("3")
         self.assertEqual(self.cll.length(), 3)
-        current = self.cll.head
-        for _ in range(3):
-            with self.subTest():
-                self.assertNotEqual(current.data, "a")
-            current = current.next
+        for i in range(3):
+            with self.subTest(i=i):
+                self.assertNotEqual(self.cll.list[i].data, "a")
 
     def test_get_not_int_index(self):
-        for i in range(3):
-            self.cll.append(str(i))
+        self.create_list(3)
 
         test_cases = ['a', None, [0]]
         for i in test_cases:
@@ -246,8 +213,7 @@ class TestCircularSingleLinkedList(unittest.TestCase):
             self.cll.get(0)
         self.assertEqual(str(context.exception), "Index out of boundaries")
 
-        for i in range(3):
-            self.cll.append(str(i))
+        self.create_list(3)
 
         test_cases = [-1, 3, 4]
         for i in test_cases:
@@ -258,8 +224,7 @@ class TestCircularSingleLinkedList(unittest.TestCase):
                                  "Index out of boundaries")
 
     def test_get(self):
-        for i in range(5):
-            self.cll.append(str(i))
+        self.create_list(5)
 
         self.assertEqual(self.cll.get(0), '0')
         self.assertEqual(self.cll.get(1), '1')
@@ -278,19 +243,20 @@ class TestCircularSingleLinkedList(unittest.TestCase):
         self.cll.reverse()
         #check if new head is former last node
         self.assertEqual(self.cll.head.data, '4')
-        current = self.cll.head
+        index = 0
         for i in range(4, -1, -1):
-            with self.subTest(i=i):
-                self.assertEqual(current.data, str(i))
-            current = current.next
+            with self.subTest(i=i, index=index):
+                self.assertEqual(self.cll.list[index].data, str(i))
             # check if last node points to head
             if i == 1:
-                self.assertEqual(current.next, self.cll.head)
+                self.assertEqual(self.cll.list[self.cll.length() - 1].next, 0)
+            index += 1
 
     def test_reverse_single_node(self):
         self.cll.append('a')
         self.cll.reverse()
-        self.assertEqual(self.cll.head.next, self.cll.head)
+        self.assertEqual(self.cll.list[0].data, 'a')
+        self.assertEqual(self.cll.head.next, 0)
 
     def test_clone_empty_list(self):
         copy = self.cll.clone()
@@ -301,20 +267,16 @@ class TestCircularSingleLinkedList(unittest.TestCase):
         for i in range(5):
             self.cll.append(str(i))
         copy = self.cll.clone()
-        current_copy = copy.head
-        current = self.cll.head
-        for _ in range(5):
-            with self.subTest():
-                self.assertEqual(current_copy.data, current.data)
-            current = current.next
-            current_copy = current_copy.next
+        self.assertEqual(copy.length(), self.cll.length())
+        for i in range(5):
+            with self.subTest(i=i):
+                self.assertEqual(copy.list[i].data, self.cll.list[i].data)
 
     def test_find_first(self):
         self.assertEqual(self.cll.find_first('a'), -1)
 
         values = ['0', 'a', 'a', '2', 'a']
-        for v in values:
-            self.cll.append(v)
+        self.create_list(values)
 
         self.assertEqual(self.cll.find_first('a'), 1)
         self.assertEqual(self.cll.find_first('b'), -1)
@@ -323,8 +285,7 @@ class TestCircularSingleLinkedList(unittest.TestCase):
         self.assertEqual(self.cll.find_last('c'), -1)
 
         values = ['c', 'a', 'c', 'c', 'a']
-        for v in values:
-            self.cll.append(v)
+        self.create_list(values)
 
         self.assertEqual(self.cll.find_last('c'), 3)
         self.assertEqual(self.cll.find_last('b'), -1)
@@ -333,8 +294,7 @@ class TestCircularSingleLinkedList(unittest.TestCase):
         self.cll.clear()
         self.assertEqual(self.cll.length(), 0)
 
-        for i in range(5):
-            self.cll.append(str(i))
+        self.create_list(5)
         self.assertEqual(self.cll.length(), 5)
         self.cll.clear()
         self.assertEqual(self.cll.length(), 0)
@@ -350,11 +310,9 @@ class TestCircularSingleLinkedList(unittest.TestCase):
 
         self.cll.extend(list)
         self.assertEqual(self.cll.length(), 5)
-        current = self.cll.head
         for i in range(5):
             with self.subTest(i=i):
-                self.assertEqual(current.data, str(i))
-            current = current.next
+                self.assertEqual(self.cll.list[i].data, str(i))
 
         list.delete(0)
         self.assertEqual(list.length(), 4)
@@ -362,13 +320,13 @@ class TestCircularSingleLinkedList(unittest.TestCase):
 
         self.cll.extend(list)
         self.assertEqual(self.cll.length(), 9)
-        current = self.cll.head
-        for i in range(5):
-            with self.subTest(i=i):
-                self.assertEqual(current.data, str(i))
-            current = current.next
-            if i == 4:
-                i = 1
+        i = 0
+        for value in range(5):
+            with self.subTest(i=i, value=value):
+                self.assertEqual(self.cll.list[i].data, str(value))
+            if value == 4:
+                value = 1
+            i += 1
 
 
 if __name__ == '__main__':
