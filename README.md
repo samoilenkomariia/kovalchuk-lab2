@@ -15,7 +15,7 @@ Circular single linked list with unit tests
 ```bash
 python --version 
 ```
-2. Download ```main.py``` and ```test_main.py``` files.
+2. Download main.py and test_main.py files.
     ```
 3. To run tests run project directory in terminal and type:
 ```bash
